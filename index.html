@@ -3,36 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مشروع السحاب - يونس السلمي</title>
+    <title>مشروع السحابة الآمن - يونس السلامي</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* تصميم شاشة القفل */
+        #lock-screen {
+            position: fixed;
+            inset: 0;
+            background: #000000;
+            color: #ffffff;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .lock-card {
+            background: #111;
+            padding: 40px;
+            border-radius: 15px;
+            border: 1px solid #333;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        #pass-input {
+            padding: 12px;
+            width: 200px;
+            border-radius: 5px;
+            border: 1px solid #444;
+            background: #222;
+            color: white;
+            text-align: center;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        .btn-lock {
+            margin-top: 15px;
+            padding: 10px 30px;
+            background: #0070f3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .btn-lock:hover { background: #0056b3; }
+        #error-msg { color: #ff4d4d; margin-top: 15px; font-size: 14px; display: none; }
+    </style>
 </head>
 <body>
 
-    <header class="header">
-        <h1>👋 أهلاً بك في مشروعي السحابي</h1>
-        <p>برنامج الأمن السيبراني (CYS)</p>
-    </header>
+    <div id="lock-screen">
+        <div class="lock-card">
+            <div style="font-size: 50px; margin-bottom: 10px;">🔒</div>
+            <h2>منطقة محمية - CYS</h2>
+            <p>يجب إدخال رمز الوصول لاستعراض البيانات السحابية</p>
+            <input type="password" id="pass-input" placeholder="أدخل الرمز">
+            <br>
+            <button class="btn-lock" onclick="checkPass()">تحقق ودخول</button>
+            <p id="error-msg">❌ الرمز غير صحيح، حاول مجدداً</p>
+        </div>
+    </div>
 
-    <main class="container">
-        <section class="profile-card">
-            <h2>المعلومات الشخصية</h2>
-            <ul class="info-list">
-                <li><span class="label">الاسم:</span> يونس السلمي</li>
-                <li><span class="label">المهمة:</span> تكليف الحوسبة السحابية</li>
-                <li><span class="label">المنصة:</span> Vercel Cloud</li>
-            </ul>
-        </section>
+    <div id="main-content" style="display: none;">
+        <header class="header">
+            <h1>👋 أهلاً بك في مشروعي السحابي الآمن</h1>
+            <p>برنامج الأمن السيبراني (CYS)</p>
+        </header>
 
-        <section class="cloud-info">
-            <h2>📄 تفاصيل الأمان (CYS)</h2>
-            <p>هذا الموقع مستضاف بشكل آمن عبر Vercel. يتميز بتوفير تشفير تلقائي (HTTPS) وحماية مدمجة ضد هجمات DDoS.</p>
-            <div id="time-display" class="time-widget">جاري تحميل الوقت...</div>
-        </section>
-    </main>
+        <main class="container">
+            <section class="profile-card">
+                <h2>المعلومات الشخصية</h2>
+                <ul class="info-list">
+                    <li><span class="label">الاسم:</span> يونس السلامي</li>
+                    <li><span class="label">المهمة:</span> تكليف الحوسبة السحابية</li>
+                    <li><span class="label">المنصة:</span> Vercel Cloud</li>
+                </ul>
+            </section>
 
-    <footer class="footer">
-        <p>&copy; 2025. تم النشر سحابياً عبر GitHub & Vercel.</p>
-    </footer>
+            <section class="cloud-info">
+                <h2>📄 تفاصيل الأمان (CYS)</h2>
+                <p>هذا الموقع محمي بطبقة تحقق برمجية للتأكد من هوية المستخدم قبل عرض المحتوى.</p>
+                <div id="time-display" class="time-widget">جاري تحميل الوقت...</div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2025. تم النشر سحابياً عبر GitHub & Vercel.</p>
+        </footer>
+    </div>
 
     <script src="script.js"></script>
 </body>
