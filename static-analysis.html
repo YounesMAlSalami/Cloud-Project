@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <title>🔍 SBARDS Static Analysis</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/static/css/themes.css" rel="stylesheet">
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--theme-bg-primary);
+            color: var(--theme-text-primary);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: var(--theme-accent-primary);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            border-radius: 12px;
+        }
+
+        .header h1 {
+            margin: 0 0 1rem 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .header p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .upload-section {
+            background: var(--theme-bg-secondary);
+            border: 2px solid var(--theme-border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--theme-border-color);
+            border-radius: 8px;
+            padding: 3rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .upload-area:hover {
+            border-color: var(--theme-accent-primary);
+            background: var(--theme-bg-tertiary);
+        }
+
+        .upload-area.dragover {
+            border-color: var(--theme-accent-primary);
+            background: var(--theme-accent-primary);
+            color: white;
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--theme-accent-primary);
+            margin-bottom: 1rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .analyzers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .analyzer-card {
+            background: var(--theme-bg-secondary);
+            border: 2px solid var(--theme-border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .analyzer-card:hover {
+            border-color: var(--theme-accent-primary);
+            transform: translateY(-2px);
+        }
+
+        .analyzer-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .analyzer-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--theme-text-primary);
+        }
+
+        .analyzer-description {
+            color: var(--theme-text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .analyzer-btn {
+            background: var(--theme-accent-primary);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 0.2rem;
+        }
+
+        .analyzer-btn:hover {
+            background: var(--theme-accent-secondary);
+        }
+
+        .analyzer-btn.secondary {
+            background: var(--theme-bg-tertiary);
+            color: var(--theme-text-primary);
+            border: 2px solid var(--theme-border-color);
+        }
+
+        .results-section {
+            background: var(--theme-bg-secondary);
+            border: 2px solid var(--theme-border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .result-card {
+            background: var(--theme-bg-tertiary);
+            border: 1px solid var(--theme-border-color);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--theme-bg-tertiary);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--theme-accent-primary);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .btn {
+            background: var(--theme-accent-primary);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 0.5rem;
+        }
+
+        .btn:hover {
+            background: var(--theme-accent-secondary);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn.secondary {
+            background: var(--theme-bg-tertiary);
+            color: var(--theme-text-primary);
+            border: 2px solid var(--theme-border-color);
+        }
+
+        .status-section {
+            background: var(--theme-bg-secondary);
+            border: 2px solid var(--theme-border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .status-card {
+            background: var(--theme-bg-tertiary);
+            border: 1px solid var(--theme-border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .status-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .status-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--theme-text-primary);
+        }
+
+        .status-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--theme-success);
+        }
+
+        .text-center { text-align: center; }
+        .mb-1 { margin-bottom: 1rem; }
+        .mb-2 { margin-bottom: 2rem; }
+        .mt-2 { margin-top: 2rem; }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🔍 SBARDS Static Analysis</h1>
+            <p>Fast & Accurate File Security Analysis</p>
+        </div>
+
+        <!-- File Upload Section -->
+        <div class="upload-section">
+            <h2>📁 Upload Files for Analysis</h2>
+            <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-icon">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <div>Drop files here or click to browse</div>
+                <small>Supports all file types • Max size: 100MB</small>
+                <input type="file" id="fileInput" class="file-input" multiple accept="*/*">
+            </div>
+
+            <div class="text-center">
+                <button class="btn" id="analyzeBtn" onclick="startAnalysis()" disabled>
+                    <i class="fas fa-play"></i> Start Analysis
+                </button>
+                <button class="btn" onclick="showWorkflowInfo()" style="background: var(--theme-info);">
+                    <i class="fas fa-info-circle"></i> Workflow Info
+                </button>
+                <!-- Added navigation links to new pages -->
+                <a href="/api/static-analysis/statistics/page" class="btn secondary">
+                    <i class="fas fa-chart-pie"></i> View Statistics
+                </a>
+                <a href="/api/response/results/page" class="btn secondary">
+                    <i class="fas fa-tasks"></i> Response Results
+                </a>
+                <a href="/dashboard" class="btn secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+
+        <!-- Analysis Status -->
+        <div class="status-section">
+            <h2>📊 System Status</h2>
+            <div class="status-grid">
+                <div class="status-card">
+                    <div class="status-icon">🔍</div>
+                    <div class="status-title">Capture Layer</div>
+                    <div class="status-value" id="captureStatus">Active</div>
+                </div>
+                <div class="status-card">
+                    <div class="status-icon">🛡️</div>
+                    <div class="status-title">Static Analysis</div>
+                    <div class="status-value" id="staticStatus">Ready</div>
+                </div>
+                <div class="status-card">
+                    <div class="status-icon">📁</div>
+                    <div class="status-title">Files Processed</div>
+                    <div class="status-value" id="filesProcessed">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-section" id="resultsSection">
+            <h2>📊 Analysis Results</h2>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="results-grid" id="resultsGrid">
+                <!-- Results will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let selectedFiles = [];
+        let analysisResults = {};
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeUploadArea();
+            loadSystemStatus();
+
+            // Update status every 5 seconds
+            setInterval(loadSystemStatus, 5000);
+        });
+
+        // Load system status
+        async function loadSystemStatus() {
+            try {
+                // Check capture layer status
+                const captureResponse = await fetch('/api/capture/status');
+                if (captureResponse.ok) {
+                    document.getElementById('captureStatus').textContent = 'Active';
+                    document.getElementById('captureStatus').style.color = 'var(--theme-success)';
+                } else {
+                    document.getElementById('captureStatus').textContent = 'Inactive';
+                    document.getElementById('captureStatus').style.color = 'var(--theme-error)';
+                }
+
+                // Check static analysis status
+                const staticResponse = await fetch('/api/static-analysis/statistics/data');
+                if (staticResponse.ok) {
+                    document.getElementById('staticStatus').textContent = 'Ready';
+                    document.getElementById('staticStatus').style.color = 'var(--theme-success)';
+                } else {
+                    document.getElementById('staticStatus').textContent = 'Error';
+                    document.getElementById('staticStatus').style.color = 'var(--theme-error)';
+                }
+
+                // Get files processed count
+                const filesResponse = await fetch('/api/capture/files-processed-count');
+                if (filesResponse.ok) {
+                    const data = await filesResponse.json();
+                    document.getElementById('filesProcessed').textContent = data.total_files_processed || 0;
+                }
+            } catch (error) {
+                console.error('Error loading system status:', error);
+            }
+        }
+
+        // Initialize upload area
+        function initializeUploadArea() {
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+            const analyzeBtn = document.getElementById('analyzeBtn');
+
+            // Drag and drop events
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                const files = Array.from(e.dataTransfer.files);
+                handleFileSelection(files);
+            });
+
+            // File input change
+            fileInput.addEventListener('change', function(e) {
+                const files = Array.from(e.target.files);
+                handleFileSelection(files);
+            });
+        }
+
+        // Handle file selection
+        function handleFileSelection(files) {
+            selectedFiles = files;
+            updateUploadArea();
+            updateAnalyzeButton();
+        }
+
+        // Update upload area display
+        function updateUploadArea() {
+            const uploadArea = document.getElementById('uploadArea');
+            const uploadIcon = uploadArea.querySelector('.upload-icon i');
+            const uploadText = uploadArea.querySelector('div:nth-child(2)');
+
+            if (selectedFiles.length > 0) {
+                uploadIcon.className = 'fas fa-check-circle';
+                uploadText.textContent = `${selectedFiles.length} file(s) selected`;
+                uploadArea.style.borderColor = 'var(--theme-success)';
+            } else {
+                uploadIcon.className = 'fas fa-cloud-upload-alt';
+                uploadText.textContent = 'Drop files here or click to browse';
+                uploadArea.style.borderColor = 'var(--theme-border-color)';
+            }
+        }
+
+        // Update analyze button
+        function updateAnalyzeButton() {
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            if (selectedFiles.length > 0) {
+                analyzeBtn.disabled = false;
+            } else {
+                analyzeBtn.disabled = true;
+            }
+        }
+
+        // Start analysis
+        async function startAnalysis() {
+            if (selectedFiles.length === 0) {
+                alert('Please select files to analyze');
+                return;
+            }
+
+            // Show results section
+            const resultsSection = document.getElementById('resultsSection');
+            resultsSection.style.display = 'block';
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+
+            // Reset progress
+            updateProgress(0);
+
+            // Clear previous results
+            const resultsGrid = document.getElementById('resultsGrid');
+            resultsGrid.innerHTML = '';
+
+            try {
+                for (let i = 0; i < selectedFiles.length; i++) {
+                    const file = selectedFiles[i];
+                    await analyzeFile(file, i + 1, selectedFiles.length);
+                }
+                updateProgress(100);
+                alert('Analysis completed successfully!');
+            } catch (error) {
+                console.error('Analysis error:', error);
+                alert('Analysis failed: ' + error.message);
+            }
+        }
+
+        // Analyze single file
+        async function analyzeFile(file, fileIndex, totalFiles) {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/api/static-analysis/upload-analyze', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                // Update progress
+                const progress = (fileIndex / totalFiles) * 100;
+                updateProgress(progress);
+
+                // Display results
+                displayFileResults(file.name, result);
+
+                // Store results
+                analysisResults[file.name] = result;
+
+            } catch (error) {
+                console.error(`Error analyzing ${file.name}:`, error);
+                displayFileError(file.name, error.message);
+            }
+        }
+
+        // Update progress bar
+        function updateProgress(percentage) {
+            const progressFill = document.getElementById('progressFill');
+            progressFill.style.width = percentage + '%';
+        }
+
+        // Display file results
+        function displayFileResults(filename, result) {
+            const resultsGrid = document.getElementById('resultsGrid');
+
+            const resultCard = document.createElement('div');
+            resultCard.className = 'result-card';
+
+            // Extract real analysis data
+            const analysisResult = result.analysis_result || result;
+            const staticReport = analysisResult.static_analysis_report || {};
+            const captureInfo = analysisResult.capture_info || {};
+
+            // Determine status based on actual analysis
+            let statusIcon = '✅';
+            let statusColor = 'var(--theme-success)';
+            let statusText = 'CLEAN';
+
+            if (analysisResult.verdict === 'malicious' || analysisResult.is_malicious) {
+                statusIcon = '🚨';
+                statusColor = 'var(--theme-error)';
+                statusText = 'MALICIOUS';
+            } else if (analysisResult.verdict === 'suspicious' || analysisResult.is_suspicious) {
+                statusIcon = '⚠️';
+                statusColor = 'var(--theme-warning)';
+                statusText = 'SUSPICIOUS';
+            }
+
+            // Build detailed results
+            let detailsHTML = '';
+
+            // Capture Layer Info
+            if (captureInfo.file_hash) {
+                detailsHTML += `<p><strong>File Hash:</strong> ${captureInfo.file_hash.substring(0, 16)}...</p>`;
+            }
+
+            if (captureInfo.file_size) {
+                detailsHTML += `<p><strong>File Size:</strong> ${(captureInfo.file_size / 1024).toFixed(2)} KB</p>`;
+            }
+
+            // Static Analysis Results
+            if (staticReport.yara_matches && staticReport.yara_matches.length > 0) {
+                detailsHTML += `<p><strong>YARA Matches:</strong> ${staticReport.yara_matches.length}</p>`;
+                detailsHTML += `<ul>`;
+                staticReport.yara_matches.slice(0, 3).forEach(match => {
+                    detailsHTML += `<li>${match.rule || match}</li>`;
+                });
+                detailsHTML += `</ul>`;
+            }
+
+            if (staticReport.permission_analysis) {
+                detailsHTML += `<p><strong>Permissions:</strong> ${staticReport.permission_analysis.status || 'Checked'}</p>`;
+            }
+
+            if (staticReport.entropy_analysis) {
+                detailsHTML += `<p><strong>Entropy:</strong> ${staticReport.entropy_analysis.entropy?.toFixed(2) || 'N/A'}</p>`;
+            }
+
+            // Analysis workflow status
+            if (analysisResult.workflow_status) {
+                detailsHTML += `<p><strong>Workflow:</strong> ${analysisResult.workflow_status}</p>`;
+            }
+
+            resultCard.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                    <div style="font-size: 2rem;">${statusIcon}</div>
+                    <div>
+                        <div style="font-weight: 600;">${filename}</div>
+                        <div style="color: ${statusColor}; font-weight: 600;">${statusText}</div>
+                    </div>
+                </div>
+                <div>
+                    ${detailsHTML}
+                    <p><strong>Analysis Time:</strong> ${new Date().toLocaleTimeString()}</p>
+                </div>
+            `;
+
+            resultsGrid.appendChild(resultCard);
+        }
+
+        // Display file error
+        function displayFileError(filename, error) {
+            const resultsGrid = document.getElementById('resultsGrid');
+
+            const resultCard = document.createElement('div');
+            resultCard.className = 'result-card';
+            resultCard.style.borderColor = 'var(--theme-error)';
+
+            resultCard.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                    <div style="font-size: 2rem;">❌</div>
+                    <div>
+                        <div style="font-weight: 600;">${filename}</div>
+                        <div style="color: var(--theme-error); font-weight: 600;">ERROR</div>
+                    </div>
+                </div>
+                <div>
+                    <p><strong>Error:</strong> ${error}</p>
+                </div>
+            `;
+
+            resultsGrid.appendChild(resultCard);
+        }
+
+        // Show workflow information
+        function showWorkflowInfo() {
+            alert(`🔄 SBARDS Complete Workflow:
+
+1. 📥 File Capture: Files intercepted before system entry
+2. 🔒 Secure Storage: Stored in isolated temporary folder
+3. 🔍 Metadata Extraction: Hash calculated twice for verification
+4. 💾 Database Storage: Encrypted storage of file information
+5. 🛡️ Static Analysis: YARA, signatures, permissions check
+6. 📊 Results Storage: Analysis results stored in database
+7. 🎯 Decision Making: Clean/Suspicious/Malicious classification
+8. 📁 File Routing: Restore/Dynamic Analysis/Quarantine
+
+Current Status: All layers integrated and operational!`);
+        }
+    </script>
+</body>
+</html>

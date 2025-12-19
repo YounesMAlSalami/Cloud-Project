@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <title>SBARDS Security Analysis Report - User Friendly</title>
+    <link rel="stylesheet" href="/static/main.css">
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: #f0f2f5; 
+            direction: ltr;
+            margin: 0;
+            padding: 0;
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 20px auto; 
+            background: #fff; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+            padding: 32px; 
+        }
+        h1 { 
+            color: #2c3e50; 
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+        }
+        h2 { 
+            color: #2c3e50; 
+            margin-top: 32px; 
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            font-size: 1.5em;
+        }
+        .section { 
+            margin-bottom: 36px; 
+            border-bottom: 1px solid #eee; 
+            padding-bottom: 24px; 
+        }
+        .analyzer-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 12px; 
+        }
+        .analyzer-table th, .analyzer-table td { 
+            padding: 14px 16px; 
+            border: 1px solid #e0e0e0; 
+            text-align: left; 
+        }
+        .analyzer-table th { 
+            background-color: #f8f9fa; 
+            font-weight: 600; 
+        }
+        .badge { 
+            display: inline-block; 
+            padding: 8px 16px; 
+            border-radius: 20px; 
+            color: #fff; 
+            font-size: 0.95em; 
+            font-weight: 500;
+            text-align: center;
+            min-width: 100px;
+        }
+        .badge.safe { 
+            background: #28a745; 
+        }
+        .badge.suspicious { 
+            background: #ffc107; 
+            color: #212529;
+        }
+        .badge.malicious { 
+            background: #dc3545; 
+        }
+        .badge.info { 
+            background: #17a2b8; 
+        }
+        .verdict { 
+            font-weight: bold; 
+            font-size: 1.4em; 
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .verdict.safe { 
+            background: #d4edda; 
+            color: #155724; 
+            border: 2px solid #c3e6cb;
+        }
+        .verdict.suspicious { 
+            background: #fff3cd; 
+            color: #856404; 
+            border: 2px solid #ffeaa7;
+        }
+        .verdict.malicious { 
+            background: #f8d7da; 
+            color: #721c24; 
+            border: 2px solid #f5c6cb;
+        }
+        .final-section { 
+            background: #f9f9f9; 
+            border-radius: 10px; 
+            padding: 25px; 
+            margin-top: 25px; 
+            border: 1px solid #e9ecef;
+        }
+        .decision { 
+            font-size: 1.5em; 
+            margin: 20px 0; 
+            font-weight: bold;
+            text-align: center;
+        }
+        .actions { 
+            margin-top: 30px; 
+            padding-top: 25px;
+            border-top: 1px solid #eee;
+            text-align: center;
+        }
+        .actions button { 
+            margin: 0 12px 12px 0; 
+            padding: 12px 24px; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 1.1em; 
+            cursor: pointer; 
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        .actions .approve { 
+            background: #28a745; 
+            color: #fff; 
+        }
+        .actions .approve:hover { 
+            background: #218838; 
+        }
+        .actions .quarantine { 
+            background: #ffc107; 
+            color: #212529; 
+        }
+        .actions .quarantine:hover { 
+            background: #e0a800; 
+        }
+        .actions .delete { 
+            background: #dc3545; 
+            color: #fff; 
+        }
+        .actions .delete:hover { 
+            background: #c82333; 
+        }
+        .file-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 35px;
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+        }
+        .file-info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        .file-info-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+        .file-info-value {
+            font-size: 1.15em;
+            color: #212529;
+            word-break: break-all;
+        }
+        .collapsible {
+            background-color: #f1f1f1;
+            color: #444;
+            cursor: pointer;
+            padding: 20px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 16px;
+            margin: 8px 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+        }
+        .collapsible:hover {
+            background-color: #ddd;
+        }
+        .collapsible:after {
+            content: '\002B';
+            font-size: 22px;
+        }
+        .collapsible.active:after {
+            content: "\2212";
+        }
+        .content {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background-color: #f9f9f9;
+            border-radius: 0 0 8px 8px;
+        }
+        .content.active {
+            max-height: 1000px;
+            padding: 20px;
+        }
+        .progress-container {
+            margin: 25px 0;
+        }
+        .progress-bar {
+            width: 100%;
+            background-color: #e9ecef;
+            border-radius: 12px;
+            overflow: hidden;
+            height: 24px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #007bff, #28a745);
+            width: 100%;
+            transition: width 0.6s ease;
+        }
+        .progress-text {
+            text-align: center;
+            margin-top: 12px;
+            font-weight: 500;
+            font-size: 1.1em;
+        }
+        .explanation {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .explanation h3 {
+            margin-top: 0;
+            color: #0d47a1;
+        }
+        .explanation p {
+            margin-bottom: 0;
+            line-height: 1.6;
+        }
+        .confidence-meter {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+        }
+        .confidence-label {
+            width: 120px;
+            font-weight: 500;
+        }
+        .confidence-bar-container {
+            flex: 1;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .confidence-bar {
+            height: 100%;
+            border-radius: 10px;
+        }
+        .confidence-bar.safe {
+            background: #28a745;
+        }
+        .confidence-bar.suspicious {
+            background: #ffc107;
+        }
+        .confidence-bar.malicious {
+            background: #dc3545;
+        }
+        .confidence-value {
+            width: 60px;
+            text-align: right;
+            font-weight: 500;
+        }
+        .recommendation {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .recommendation h3 {
+            margin-top: 0;
+            color: #856404;
+        }
+        .recommendation ul {
+            margin-bottom: 0;
+            padding-left: 20px;
+        }
+        .recommendation li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🛡️ SBARDS Security Analysis Report</h1>
+    <p style="text-align: center; font-size: 1.2em; color: #666; margin-bottom: 30px;">
+        Comprehensive security analysis of your file with clear explanations
+    </p>
+    
+    <!-- File Information -->
+    <div class="section">
+        <h2>📁 File Information</h2>
+        <div class="file-info">
+            <div class="file-info-item">
+                <span class="file-info-label">File Name</span>
+                <span class="file-info-value" id="fileName">{{ filename }}</span>
+            </div>
+            <div class="file-info-item">
+                <span class="file-info-label">File Size</span>
+                <span class="file-info-value" id="fileSize">{{ file_size }}</span>
+            </div>
+            <div class="file-info-item">
+                <span class="file-info-label">File Hash (SHA-256)</span>
+                <span class="file-info-value" id="fileHash">{{ file_hash }}</span>
+            </div>
+            <div class="file-info-item">
+                <span class="file-info-label">Analysis Date</span>
+                <span class="file-info-value" id="analysisDate">{{ analysis_date }}</span>
+            </div>
+        </div>
+        
+        <div class="progress-container">
+            <h3>Analysis Progress</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 100%"></div>
+            </div>
+            <div class="progress-text" id="progressText">100% Complete - Analysis finished</div>
+        </div>
+    </div>
+
+    <!-- Final Verdict Section -->
+    <div class="section">
+        <h2>📋 Final Security Verdict</h2>
+        <div class="final-section">
+            <div class="verdict {{ verdict.lower() }}" id="finalVerdict">
+                <h2>FINAL VERDICT: <strong>{{ verdict }}</strong></h2>
+                <p style="font-size: 1.2em; margin-top: 15px;">Confidence Level: <strong>{{ confidence }}</strong></p>
+            </div>
+            <div class="explanation">
+                <h3>What does this mean?</h3>
+                {% if verdict == "SAFE" %}
+                <p>✅ This file has been thoroughly analyzed by multiple security engines and has been determined to be safe for use. No malicious indicators were detected during the comprehensive analysis process.</p>
+                <div class="recommendation">
+                    <h4>Why this file is considered safe:</h4>
+                    <ul>
+                        <li>No known malware signatures detected</li>
+                        <li>File permissions are compliant with security policies</li>
+                        <li>Entropy score is within normal range for this file type</li>
+                        <li>All security analyzers returned clean results</li>
+                    </ul>
+                </div>
+                {% elif verdict == "SUSPICIOUS" %}
+                <p>⚠️ This file has been flagged as suspicious by our security engines. While it may not be immediately harmful, it contains characteristics that warrant caution. The file has been moved to monitoring and requires further analysis before access is granted.</p>
+                <div class="recommendation">
+                    <h4>Why this file is considered suspicious:</h4>
+                    <ul>
+                        <li>Contains unusual characteristics that require further investigation</li>
+                        <li>May have high entropy indicating possible encryption or packing</li>
+                        <li>Requires manual review by security personnel</li>
+                        <li>Access restricted until additional verification is completed</li>
+                    </ul>
+                </div>
+                {% elif verdict == "MALICIOUS" %}
+                <p>🚨 This file has been identified as malicious and poses a security threat. It has been quarantined to prevent potential harm to your system. Do not attempt to access or execute this file.</p>
+                <div class="recommendation">
+                    <h4>Why this file is considered malicious:</h4>
+                    <ul>
+                        <li>Detected known malware signatures</li>
+                        <li>Contains malicious code patterns</li>
+                        <li>High entropy indicating possible encryption or packing</li>
+                        <li>Confirmed security threat - immediate action required</li>
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+            <div class="confidence-meter">
+                <div class="confidence-label">Confidence Level:</div>
+                <div class="confidence-bar-container">
+                    <div class="confidence-bar {{ verdict.lower() }}" id="confidenceBar"></div>
+                </div>
+                <div class="confidence-value" id="confidenceValue">{{ confidence }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Static Analysis Results -->
+    <div class="section">
+        <h2>🔍 Static Analysis Results</h2>
+        <p>Results from 8 analyzers in the static analysis layer</p>
+        
+        <button type="button" class="collapsible">Show Detailed Analysis Results</button>
+        <div class="content" id="staticAnalysisContent">
+            <table class="analyzer-table">
+                <thead>
+                    <tr>
+                        <th>Security Engine</th>
+                        <th>Result</th>
+                        <th>Explanation</th>
+                    </tr>
+                </thead>
+                <tbody id="static-analyzers-results">
+                    <tr>
+                        <td>🛡️ YARA Scanner</td>
+                        <td><span class="badge {{ 'safe' if yara_matches == 0 else 'malicious' }}">{{ 'SAFE' if yara_matches == 0 else 'MALICIOUS' }}</span></td>
+                        <td>{{ 'No known malware signatures detected. Scanned against multiple malware rule sets.' if yara_matches == 0 else 'Detected ' + yara_matches|string + ' known malware signatures.' }}</td>
+                    </tr>
+                    <tr>
+                        <td>🔐 Permission Analyzer</td>
+                        <td><span class="badge {{ 'safe' if permissions_ok == True else 'suspicious' }}">{{ 'SAFE' if permissions_ok == True else 'SUSPICIOUS' }}</span></td>
+                        <td>{{ 'File permissions are compliant with security policies.' if permissions_ok == True else 'File permissions may pose a security risk.' }}</td>
+                    </tr>
+                    <tr>
+                        <td>📈 Entropy Calculator</td>
+                        <td><span class="badge {{ 'safe' if entropy_score != 'Unknown' and entropy_score|float < 7.5 else 'suspicious' }}">{{ 'SAFE' if entropy_score != 'Unknown' and entropy_score|float < 7.5 else 'SUSPICIOUS' }}</span></td>
+                        <td>{{ 'Normal entropy score (' + entropy_score|string + ') - file is not packed or encrypted.' if entropy_score != 'Unknown' else 'Entropy analysis not performed.' }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Detailed Classification Explanation -->
+    <div class="section">
+        <h2>📋 Detailed Classification Explanation</h2>
+        <div class="explanation">
+            <h3>How SBARDS Determines File Safety</h3>
+            <p>Our advanced security system uses multiple analytical techniques to determine if a file is safe, suspicious, or malicious:</p>
+            <ul>
+                <li><strong>YARA Signature Scanning:</strong> Checks against thousands of known malware patterns</li>
+                <li><strong>Entropy Analysis:</strong> Measures randomness in file content to detect encryption/packing</li>
+                <li><strong>Permission Analysis:</strong> Verifies file permissions comply with security policies</li>
+                <li><strong>File Type Context:</strong> Considers normal characteristics for each file type</li>
+                <li><strong>Machine Learning:</strong> Uses AI models to detect novel threats</li>
+            </ul>
+            <p>Each analyzer contributes to an overall confidence score that determines the final classification.</p>
+        </div>
+        
+        <div class="recommendation">
+            <h3>Classification Criteria</h3>
+            <ul>
+                <li><strong>SAFE (Confidence &lt; 35%):</strong> No significant threats detected, file approved for use</li>
+                <li><strong>SUSPICIOUS (Confidence 35-75%):</strong> Unusual characteristics detected, requires review</li>
+                <li><strong>MALICIOUS (Confidence &gt; 75%):</strong> Confirmed threat detected, immediate action required</li>
+            </ul>
+        </div>
+        
+        <div class="explanation">
+            <h3>Analysis Details for This File</h3>
+            <ul>
+                {% for explanation in detailed_explanation %}
+                <li>{{ explanation }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Recommendations -->
+    <div class="section">
+        <h2>💡 Security Recommendations</h2>
+        <div class="recommendation">
+            <h3>Based on our analysis, we recommend:</h3>
+            <ul>
+                {% if verdict == "SAFE" %}
+                <li>No action needed - file is safe to use</li>
+                <li>Regularly update your antivirus definitions</li>
+                <li>Continue practicing safe browsing habits</li>
+                <li>Enable real-time protection for continuous monitoring</li>
+                {% elif verdict == "SUSPICIOUS" %}
+                <li>Do not open this file unless absolutely necessary</li>
+                <li>Contact your IT security team for further analysis</li>
+                <li>Monitor your system for unusual activity</li>
+                <li>Consider scanning with additional antivirus engines</li>
+                {% elif verdict == "MALICIOUS" %}
+                <li>Do not open or execute this file under any circumstances</li>
+                <li>Immediately quarantine or delete the file</li>
+                <li>Scan your system for potential infections</li>
+                <li>Report this incident to your IT security team</li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Response Layer Decision -->
+    <div class="section">
+        <h2>🛡️ Final Decision</h2>
+        <div class="final-section">
+            <div class="decision" id="response-decision">
+                {% if verdict == "SAFE" %}
+                <i class="fas fa-check-circle"></i> FILE DECLARED SAFE FOR USE
+                {% elif verdict == "SUSPICIOUS" %}
+                <i class="fas fa-exclamation-triangle"></i> FILE MARKED SUSPICIOUS - MONITORING ACTIVATED
+                {% elif verdict == "MALICIOUS" %}
+                <i class="fas fa-ban"></i> FILE QUARANTINED - SECURITY THREAT DETECTED
+                {% endif %}
+            </div>
+            <div class="explanation">
+                <h3>What happens next?</h3>
+                {% if verdict == "SAFE" %}
+                <p>This file has been approved and can be safely used. It will be monitored for any unusual activity, but no restrictions are placed on its usage.</p>
+                {% elif verdict == "SUSPICIOUS" %}
+                <p>This file has been moved to monitoring and requires further analysis. Access to the file is restricted until additional verification is completed.</p>
+                {% elif verdict == "MALICIOUS" %}
+                <p>This file has been quarantined to prevent potential harm to your system. It should be deleted or analyzed in a secure environment only.</p>
+                {% endif %}
+            </div>
+            <div style="margin-top: 20px; font-size: 1.1em;">
+                <strong>Threat Percentage:</strong> {{ confidence }}<br>
+                <strong>File Type:</strong> {{ file_type }}<br>
+                <strong>Quarantine Status:</strong> {{ 'N/A (File is clean)' if verdict == 'SAFE' else ('Pending review' if verdict == 'SUSPICIOUS' else 'Quarantined') }}<br>
+                <strong>Next Review:</strong> {{ 'Automatic in 30 days' if verdict == 'SAFE' else ('Manual review required' if verdict == 'SUSPICIOUS' else 'Security team review') }}
+            </div>
+        </div>
+    </div>
+
+    <div class="actions">
+        <button class="approve">✅ Approve File</button>
+        <button class="quarantine">⚠️ Quarantine File</button>
+        <button class="delete">🗑️ Delete File</button>
+    </div>
+    
+    <!-- Navigation Links -->
+    <div style="text-align: center; margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px; border: 1px solid #e9ecef;">
+        <h3 style="margin-bottom: 15px; color: #2c3e50;">🧭 Quick Navigation</h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center;">
+            <a href="/dashboard" style="display: inline-block; padding: 12px 24px; background: #6c757d; color: white; text-decoration: none; border-radius: 8px; font-weight: 500; transition: all 0.3s ease;">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+            <a href="/api/static-analysis/page" style="display: inline-block; padding: 12px 24px; background: #17a2b8; color: white; text-decoration: none; border-radius: 8px; font-weight: 500; transition: all 0.3s ease;">
+                <i class="fas fa-search"></i> Static Analysis
+            </a>
+            <a href="/api/static-analysis/statistics/page" style="display: inline-block; padding: 12px 24px; background: #28a745; color: white; text-decoration: none; border-radius: 8px; font-weight: 500; transition: all 0.3s ease;">
+                <i class="fas fa-chart-pie"></i> Analysis Statistics
+            </a>
+            <a href="/api/response/results/page" style="display: inline-block; padding: 12px 24px; background: #ffc107; color: #212529; text-decoration: none; border-radius: 8px; font-weight: 500; transition: all 0.3s ease;">
+                <i class="fas fa-tasks"></i> Response Results
+            </a>
+            <a href="/api/capture/status/page" style="display: inline-block; padding: 12px 24px; background: #dc3545; color: white; text-decoration: none; border-radius: 8px; font-weight: 500; transition: all 0.3s ease;">
+                <i class="fas fa-shield-alt"></i> Capture Status
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Set confidence bar width based on confidence value
+    document.addEventListener('DOMContentLoaded', function() {
+        // Collapsible sections
+        var coll = document.getElementsByClassName("collapsible");
+        for (var i = 0; i < coll.length; i++) {
+            coll[i].addEventListener("click", function() {
+                this.classList.toggle("active");
+                var content = this.nextElementSibling;
+                if (content.style.maxHeight){
+                    content.style.maxHeight = null;
+                } else {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                } 
+            });
+        }
+        
+        // Set confidence bar width
+        var confidenceValue = document.getElementById("confidenceValue").textContent;
+        var confidencePercent = confidenceValue.replace('%', '');
+        var confidenceBar = document.getElementById("confidenceBar");
+        if (confidenceBar && !isNaN(confidencePercent)) {
+            confidenceBar.style.width = confidencePercent + "%";
+        }
+        
+        // Set decision color based on verdict
+        var decisionElement = document.getElementById("response-decision");
+        var verdict = "{{ verdict }}";
+        if (decisionElement) {
+            if (verdict === "SAFE") {
+                decisionElement.style.color = "#28a745";
+            } else if (verdict === "SUSPICIOUS") {
+                decisionElement.style.color = "#ffc107";
+            } else {
+                decisionElement.style.color = "#dc3545";
+            }
+        }
+    });
+</script>
+</body>
+</html>

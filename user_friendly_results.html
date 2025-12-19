@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <title>SBARDS Security Analysis Report - User Friendly</title>
+    <link rel="stylesheet" href="/static/main.css">
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: #f0f2f5; 
+            direction: ltr;
+            margin: 0;
+            padding: 0;
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 20px auto; 
+            background: #fff; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+            padding: 32px; 
+        }
+        h1 { 
+            color: #2c3e50; 
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+        }
+        h2 { 
+            color: #2c3e50; 
+            margin-top: 32px; 
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            font-size: 1.5em;
+        }
+        .section { 
+            margin-bottom: 36px; 
+            border-bottom: 1px solid #eee; 
+            padding-bottom: 24px; 
+        }
+        .analyzer-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 12px; 
+        }
+        .analyzer-table th, .analyzer-table td { 
+            padding: 14px 16px; 
+            border: 1px solid #e0e0e0; 
+            text-align: left; 
+        }
+        .analyzer-table th { 
+            background-color: #f8f9fa; 
+            font-weight: 600; 
+        }
+        .badge { 
+            display: inline-block; 
+            padding: 8px 16px; 
+            border-radius: 20px; 
+            color: #fff; 
+            font-size: 0.95em; 
+            font-weight: 500;
+            text-align: center;
+            min-width: 100px;
+        }
+        .badge.safe { 
+            background: #28a745; 
+        }
+        .badge.suspicious { 
+            background: #ffc107; 
+            color: #212529;
+        }
+        .badge.malicious { 
+            background: #dc3545; 
+        }
+        .badge.info { 
+            background: #17a2b8; 
+        }
+        .verdict { 
+            font-weight: bold; 
+            font-size: 1.4em; 
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .verdict.safe { 
+            background: #d4edda; 
+            color: #155724; 
+            border: 2px solid #c3e6cb;
+        }
+        .verdict.suspicious { 
+            background: #fff3cd; 
+            color: #856404; 
+            border: 2px solid #ffeaa7;
+        }
+        .verdict.malicious { 
+            background: #f8d7da; 
+            color: #721c24; 
+            border: 2px solid #f5c6cb;
+        }
+        .final-section { 
+            background: #f9f9f9; 
+            border-radius: 10px; 
+            padding: 25px; 
+            margin-top: 25px; 
+            border: 1px solid #e9ecef;
+        }
+        .decision { 
+            font-size: 1.5em; 
+            margin: 20px 0; 
+            font-weight: bold;
+            text-align: center;
+        }
+        .actions { 
+            margin-top: 30px; 
+            padding-top: 25px;
+            border-top: 1px solid #eee;
+            text-align: center;
+        }
+        .actions button { 
+            margin: 0 12px 12px 0; 
+            padding: 12px 24px; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 1.1em; 
+            cursor: pointer; 
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        .actions .approve { 
+            background: #28a745; 
+            color: #fff; 
+        }
+        .actions .approve:hover { 
+            background: #218838; 
+        }
+        .actions .quarantine { 
+            background: #ffc107; 
+            color: #212529; 
+        }
+        .actions .quarantine:hover { 
+            background: #e0a800; 
+        }
+        .actions .delete { 
+            background: #dc3545; 
+            color: #fff; 
+        }
+        .actions .delete:hover { 
+            background: #c82333; 
+        }
+        .file-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 35px;
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+        }
+        .file-info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        .file-info-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+        .file-info-value {
+            font-size: 1.15em;
+            color: #212529;
+            word-break: break-all;
+        }
+        .collapsible {
+            background-color: #f1f1f1;
+            color: #444;
+            cursor: pointer;
+            padding: 20px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 16px;
+            margin: 8px 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+        }
+        .collapsible:hover {
+            background-color: #ddd;
+        }
+        .collapsible:after {
+            content: '\002B';
+            font-size: 22px;
+        }
+        .collapsible.active:after {
+            content: "\2212";
+        }
+        .content {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background-color: #f9f9f9;
+            border-radius: 0 0 8px 8px;
+        }
+        .content.active {
+            max-height: 1000px;
+            padding: 20px;
+        }
+        .progress-container {
+            margin: 25px 0;
+        }
+        .progress-bar {
+            width: 100%;
+            background-color: #e9ecef;
+            border-radius: 12px;
+            overflow: hidden;
+            height: 24px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #007bff, #28a745);
+            width: 100%;
+            transition: width 0.6s ease;
+        }
+        .progress-text {
+            text-align: center;
+            margin-top: 12px;
+            font-weight: 500;
+            font-size: 1.1em;
+        }
+        .explanation {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .explanation h3 {
+            margin-top: 0;
+            color: #0d47a1;
+        }
+        .explanation p {
+            margin-bottom: 0;
+            line-height: 1.6;
+        }
+        .confidence-meter {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+        }
+        .confidence-label {
+            width: 120px;
+            font-weight: 500;
+        }
+        .confidence-bar-container {
+            flex: 1;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .confidence-bar {
+            height: 100%;
+            border-radius: 10px;
+        }
+        .confidence-bar.safe {
+            background: #28a745;
+        }
+        .confidence-bar.suspicious {
+            background: #ffc107;
+        }
+        .confidence-bar.malicious {
+            background: #dc3545;
+        }
+        .confidence-value {
+            width: 60px;
+            text-align: right;
+            font-weight: 500;
+        }
+        .recommendation {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .recommendation h3 {
+            margin-top: 0;
+            color: #856404;
+        }
+        .recommendation ul {
+            margin-bottom: 0;
+            padding-left: 20px;
+        }
+        .recommendation li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🛡️ SBARDS Security Analysis Report</h1>
+    <p style="text-align: center; font-size: 1.2em; color: #666; margin-bottom: 30px;">
+        Comprehensive security analysis of your file with clear explanations
+    </p>
+    
+    <!-- File Information -->
+    <div class="section">
+        <h2>📁 File Information</h2>
+        <div class="file-info">
+            <div class="file-info-item">
+                <span class="file-info-label">File Name</span>
+                <span class="file-info-value" id="fileName">document.pdf</span>
+            </div>
+            <div class="file-info-item">
+                <span class="file-info-label">File Size</span>
+                <span class="file-info-value" id="fileSize">1.2 MB</span>
+            </div>
+            <div class="file-info-item">
+                <span class="file-info-label">File Hash (SHA-256)</span>
+                <span class="file-info-value" id="fileHash">a1b2c3d4e5f67890a1b2c3d4e5f67890a1b2c3d4e5f67890a1b2c3d4e5f67890</span>
+            </div>
+            <div class="file-info-item">
+                <span class="file-info-label">Analysis Date</span>
+                <span class="file-info-value" id="analysisDate">2025-05-30 14:30:22</span>
+            </div>
+        </div>
+        
+        <div class="progress-container">
+            <h3>Analysis Progress</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 100%"></div>
+            </div>
+            <div class="progress-text" id="progressText">100% Complete - Analysis finished</div>
+        </div>
+    </div>
+
+    <!-- Final Verdict Section -->
+    <div class="section">
+        <h2>📋 Final Security Verdict</h2>
+        <div class="final-section">
+            <div class="verdict safe" id="finalVerdict">
+                FINAL VERDICT: <strong>SAFE</strong>
+            </div>
+            <div class="explanation">
+                <h3>What does this mean?</h3>
+                <p>This file has been thoroughly analyzed by 12 different security engines and has been determined to be safe for use. No malicious indicators were detected during the comprehensive analysis process.</p>
+            </div>
+            <div class="confidence-meter">
+                <div class="confidence-label">Confidence Level:</div>
+                <div class="confidence-bar-container">
+                    <div class="confidence-bar safe" id="confidenceBar" style="width: 95%"></div>
+                </div>
+                <div class="confidence-value" id="confidenceValue">95%</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Static Analysis Results -->
+    <div class="section">
+        <h2>🔍 Static Analysis Results</h2>
+        <p>Results from 8 analyzers in the static analysis layer</p>
+        
+        <button type="button" class="collapsible">Show Detailed Analysis Results</button>
+        <div class="content" id="staticAnalysisContent">
+            <table class="analyzer-table">
+                <thead>
+                    <tr>
+                        <th>Security Engine</th>
+                        <th>Result</th>
+                        <th>Explanation</th>
+                    </tr>
+                </thead>
+                <tbody id="static-analyzers-results">
+                    <tr>
+                        <td>🛡️ YARA Scanner</td>
+                        <td><span class="badge safe">SAFE</span></td>
+                        <td>No known malware signatures detected. Scanned against 150+ malware rule sets.</td>
+                    </tr>
+                    <tr>
+                        <td>💻 Code Analyzer</td>
+                        <td><span class="badge safe">SAFE</span></td>
+                        <td>No shellcode or obfuscated code patterns detected.</td>
+                    </tr>
+                    <tr>
+                        <td>📄 Document Analyzer</td>
+                        <td><span class="badge safe">SAFE</span></td>
+                        <td>No malicious macros or embedded objects detected.</td>
+                    </tr>
+                    <tr>
+                        <td>🌐 Network Analyzer</td>
+                        <td><span class="badge safe">SAFE</span></td>
+                        <td>No suspicious network behaviors or connections detected.</td>
+                    </tr>
+                    <tr>
+                        <td>🔗 URL/IP Analyzer</td>
+                        <td><span class="badge safe">SAFE</span></td>
+                        <td>No malicious URLs or IP addresses detected.</td>
+                    </tr>
+                    <tr>
+                        <td>🔐 Permission Analyzer</td>
+                        <td><span class="badge safe">SAFE</span></td>
+                        <td>File permissions are compliant with security policies.</td>
+                    </tr>
+                    <tr>
+                        <td>📈 Entropy Calculator</td>
+                        <td><span class="badge safe">SAFE</span></td>
+                        <td>Normal entropy score (4.2) - file is not packed or encrypted.</td>
+                    </tr>
+                    <tr>
+                        <td>🧠 ML Engine</td>
+                        <td><span class="badge safe">SAFE</span></td>
+                        <td>99.8% confidence level in clean classification.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Dynamic Analysis Results -->
+    <div class="section">
+        <h2>⚡ Dynamic Analysis Results</h2>
+        <p>Results from sandbox execution and 4 ML runtime monitors</p>
+        
+        <button type="button" class="collapsible">Show Dynamic Analysis Results</button>
+        <div class="content" id="dynamicAnalysisContent">
+            <table class="analyzer-table">
+                <thead>
+                    <tr>
+                        <th>Analysis Technique</th>
+                        <th>Result</th>
+                        <th>Explanation</th>
+                    </tr>
+                </thead>
+                <tbody id="dynamic-analyzers-results">
+                    <tr>
+                        <td>CAPE Sandbox</td>
+                        <td><span class="badge safe">SAFE</span></td>
+                        <td>Executed in Windows 10 VM for 15.3 seconds. No malicious activity detected.</td>
+                    </tr>
+                    <tr>
+                        <td>🔄 Process Behavior ML</td>
+                        <td><span class="badge safe">SAFE</span></td>
+                        <td>Monitored file operations during execution. Normal behavior patterns observed.</td>
+                    </tr>
+                    <tr>
+                        <td>🖥️ System Call Monitor ML</td>
+                        <td><span class="badge safe">SAFE</span></td>
+                        <td>Observed system calls in virtual environment. No suspicious API usage detected.</td>
+                    </tr>
+                    <tr>
+                        <td>📁 File Activity ML</td>
+                        <td><span class="badge safe">SAFE</span></td>
+                        <td>Monitored file system interactions. No unauthorized file modifications detected.</td>
+                    </tr>
+                    <tr>
+                        <td>🌐 Network Activity ML</td>
+                        <td><span class="badge safe">SAFE</span></td>
+                        <td>Monitored network communications. No malicious network activity detected.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Recommendations -->
+    <div class="section">
+        <h2>💡 Security Recommendations</h2>
+        <div class="recommendation">
+            <h3>Based on our analysis, we recommend:</h3>
+            <ul>
+                <li>No action needed - file is safe to use</li>
+                <li>Regularly update your antivirus definitions</li>
+                <li>Continue practicing safe browsing habits</li>
+                <li>Enable real-time protection for continuous monitoring</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Response Layer Decision -->
+    <div class="section">
+        <h2>🛡️ Final Decision</h2>
+        <div class="final-section">
+            <div class="decision" id="response-decision" style="color: #28a745;">
+                <i class="fas fa-check-circle"></i> FILE DECLARED SAFE FOR USE
+            </div>
+            <div class="explanation">
+                <h3>What happens next?</h3>
+                <p>This file has been approved and can be safely used. It will be monitored for any unusual activity, but no restrictions are placed on its usage.</p>
+            </div>
+            <div style="margin-top: 20px; font-size: 1.1em;">
+                <strong>Threat Percentage:</strong> 0.2%<br>
+                <strong>Encryption Status:</strong> Not encrypted<br>
+                <strong>Quarantine Status:</strong> N/A (File is clean)<br>
+                <strong>Next Review:</strong> Automatic in 30 days
+            </div>
+        </div>
+    </div>
+
+    <div class="actions">
+        <button class="approve">✅ Approve File</button>
+        <button class="quarantine">⚠️ Quarantine File</button>
+        <button class="delete">🗑️ Delete File</button>
+    </div>
+</div>
+
+<script>
+    // Collapsible sections
+    document.addEventListener('DOMContentLoaded', function() {
+        var coll = document.getElementsByClassName("collapsible");
+        for (var i = 0; i < coll.length; i++) {
+            coll[i].addEventListener("click", function() {
+                this.classList.toggle("active");
+                var content = this.nextElementSibling;
+                if (content.style.maxHeight){
+                    content.style.maxHeight = null;
+                } else {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                } 
+            });
+        }
+    });
+</script>
+</body>
+</html>

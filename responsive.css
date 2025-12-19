@@ -1,0 +1,431 @@
+/* SBARDS Responsive Design CSS */
+/* Mobile-First Approach with Progressive Enhancement */
+
+/* Base Mobile Styles (320px and up) */
+@media screen and (max-width: 767px) {
+    /* Header Adjustments */
+    .dashboard-header {
+        padding: 1.5rem 0;
+    }
+    
+    .header-title {
+        font-size: 2rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .header-subtitle {
+        font-size: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .header-stats {
+        flex-direction: column;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .header-stat {
+        padding: 0.75rem;
+        min-width: 200px;
+    }
+    
+    .header-stat-value {
+        font-size: 1.5rem;
+    }
+    
+    /* Container Adjustments */
+    .dashboard-container {
+        padding: 1rem;
+    }
+    
+    /* Grid Layout */
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    /* Card Adjustments */
+    .dashboard-card {
+        padding: 1rem;
+        border-radius: 8px;
+    }
+    
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+    }
+    
+    .card-title {
+        font-size: 1.1rem;
+    }
+    
+    .card-icon {
+        font-size: 1.25rem;
+    }
+    
+    /* Metric Cards */
+    .metric-card {
+        padding: 1.5rem 1rem;
+    }
+    
+    .metric-value {
+        font-size: 2rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .metric-label {
+        font-size: 0.9rem;
+    }
+    
+    .metric-change {
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+    }
+    
+    /* Chart Container */
+    .chart-container {
+        height: 250px;
+        margin: 0.75rem 0;
+    }
+    
+    /* Status Indicators */
+    .status-indicator {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+    }
+    
+    /* Progress Bars */
+    .progress-container {
+        margin: 0.75rem 0;
+    }
+    
+    .progress-label {
+        font-size: 0.8rem;
+        margin-bottom: 0.4rem;
+    }
+    
+    .progress-bar {
+        height: 6px;
+    }
+    
+    /* Theme Toggle */
+    .theme-toggle {
+        top: 10px;
+        right: 10px;
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    
+    .theme-toggle-icon {
+        font-size: 16px;
+    }
+    
+    /* Notification Container */
+    .notification-container {
+        top: 10px;
+        right: 10px;
+        max-width: calc(100vw - 20px);
+    }
+    
+    .notification {
+        padding: 12px;
+        margin-bottom: 8px;
+    }
+    
+    /* Hide text in theme toggle on very small screens */
+    .theme-toggle span {
+        display: none;
+    }
+}
+
+/* Tablet Styles (768px to 1023px) */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+    /* Header */
+    .header-title {
+        font-size: 2.5rem;
+    }
+    
+    .header-stats {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1.5rem;
+    }
+    
+    .header-stat {
+        flex: 1;
+        min-width: 150px;
+        max-width: 200px;
+    }
+    
+    /* Container */
+    .dashboard-container {
+        padding: 1.5rem;
+    }
+    
+    /* Grid Layout */
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+    
+    /* Wide grid items */
+    .dashboard-grid-wide {
+        grid-column: 1 / -1;
+    }
+    
+    /* Cards */
+    .dashboard-card {
+        padding: 1.25rem;
+    }
+    
+    /* Chart Container */
+    .chart-container {
+        height: 280px;
+    }
+    
+    /* Metric Cards in KPI section */
+    .dashboard-grid-wide .row .col-md-3 {
+        flex: 0 0 50%;
+        max-width: 50%;
+        margin-bottom: 1rem;
+    }
+}
+
+/* Desktop Styles (1024px and up) */
+@media screen and (min-width: 1024px) {
+    /* Header */
+    .header-stats {
+        gap: 2rem;
+    }
+    
+    .header-stat {
+        min-width: 180px;
+    }
+    
+    /* Container */
+    .dashboard-container {
+        padding: 2rem;
+    }
+    
+    /* Grid Layout */
+    .dashboard-grid {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+    
+    /* Chart Container */
+    .chart-container {
+        height: 300px;
+    }
+}
+
+/* Large Desktop Styles (1200px and up) */
+@media screen and (min-width: 1200px) {
+    /* Container */
+    .dashboard-container {
+        max-width: 1400px;
+    }
+    
+    /* Grid Layout for better use of space */
+    .dashboard-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    /* Performance metrics can be 2 columns */
+    .dashboard-grid .dashboard-card:nth-child(5),
+    .dashboard-grid .dashboard-card:nth-child(6) {
+        grid-column: span 2;
+    }
+}
+
+/* Extra Large Desktop Styles (1400px and up) */
+@media screen and (min-width: 1400px) {
+    /* Header */
+    .header-title {
+        font-size: 3.5rem;
+    }
+    
+    .header-subtitle {
+        font-size: 1.3rem;
+    }
+    
+    /* Container */
+    .dashboard-container {
+        max-width: 1600px;
+        padding: 2.5rem;
+    }
+    
+    /* Chart Container */
+    .chart-container {
+        height: 350px;
+    }
+}
+
+/* Landscape Phone Styles */
+@media screen and (max-width: 767px) and (orientation: landscape) {
+    .header-stats {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .header-stat {
+        flex: 1;
+        min-width: 120px;
+    }
+    
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .chart-container {
+        height: 200px;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .theme-toggle,
+    .notification-container {
+        display: none !important;
+    }
+    
+    .dashboard-header {
+        background: #2c3e50 !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .dashboard-card {
+        break-inside: avoid;
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+        margin-bottom: 1rem;
+    }
+    
+    .chart-container {
+        height: 250px;
+    }
+    
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+    
+    .dashboard-grid-wide {
+        grid-column: 1 / -1;
+    }
+}
+
+/* High DPI / Retina Display Adjustments */
+@media screen and (-webkit-min-device-pixel-ratio: 2),
+       screen and (min-resolution: 192dpi) {
+    .card-icon,
+    .theme-toggle-icon {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .dashboard-card {
+        border-width: 0.5px;
+    }
+}
+
+/* Reduced Motion Preferences */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    .progress-fill::after {
+        animation: none;
+    }
+}
+
+/* Dark Mode Media Query Support */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --theme-bg-primary: #1a1a1a;
+        --theme-bg-secondary: #2d2d2d;
+        --theme-bg-card: #2d2d2d;
+        --theme-text-primary: #ffffff;
+        --theme-text-secondary: #b0b0b0;
+        --theme-border-color: #404040;
+    }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .dashboard-card {
+        transition: none;
+    }
+    
+    .dashboard-card:hover {
+        transform: none;
+        box-shadow: var(--shadow-md);
+    }
+    
+    .theme-toggle {
+        padding: 12px 16px;
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    .status-indicator {
+        min-height: 32px;
+        padding: 0.5rem 1rem;
+    }
+}
+
+/* Accessibility Improvements */
+@media (prefers-contrast: high) {
+    .dashboard-card {
+        border-width: 2px;
+        border-color: var(--theme-text-primary);
+    }
+    
+    .status-indicator {
+        border-width: 2px;
+    }
+    
+    .progress-bar {
+        border: 1px solid var(--theme-text-primary);
+    }
+}
+
+/* Focus Visible Support */
+@supports selector(:focus-visible) {
+    .theme-toggle:focus {
+        outline: none;
+    }
+    
+    .theme-toggle:focus-visible {
+        outline: 2px solid var(--theme-accent-primary);
+        outline-offset: 2px;
+    }
+}
+
+/* Container Queries Support (Future-proofing) */
+@supports (container-type: inline-size) {
+    .dashboard-card {
+        container-type: inline-size;
+    }
+    
+    @container (max-width: 300px) {
+        .card-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .card-title {
+            font-size: 1rem;
+        }
+    }
+}

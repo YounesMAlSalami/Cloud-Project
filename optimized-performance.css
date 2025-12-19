@@ -1,0 +1,324 @@
+/* 
+SBARDS Optimized Performance CSS
+Lightweight, fast, and smooth UI optimizations
+*/
+
+/* Performance optimizations */
+* {
+    box-sizing: border-box;
+}
+
+/* Use hardware acceleration for smooth animations */
+.dashboard-card,
+.nav-card,
+.analyzer-card,
+.stat-card {
+    transform: translateZ(0);
+    will-change: transform;
+    backface-visibility: hidden;
+}
+
+/* Optimize transitions for 60fps */
+.dashboard-card,
+.nav-card,
+.analyzer-card,
+.stat-card,
+.btn {
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Reduce repaints and reflows */
+.progress-fill {
+    transform: translateZ(0);
+    transition: width 0.3s ease-out;
+}
+
+/* Optimize font rendering */
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeSpeed;
+}
+
+/* Lightweight hover effects */
+.dashboard-card:hover,
+.nav-card:hover,
+.analyzer-card:hover {
+    transform: translateY(-2px) translateZ(0);
+}
+
+.btn:hover {
+    transform: translateY(-1px) translateZ(0);
+}
+
+/* Optimize images and icons */
+.card-icon,
+.nav-icon,
+.analyzer-icon {
+    font-display: swap;
+    contain: layout style paint;
+}
+
+/* Reduce layout thrashing */
+.stats-grid,
+.analyzers-grid,
+.feature-grid {
+    contain: layout;
+}
+
+/* Optimize scrolling */
+.container,
+.docs-container {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Lightweight loading states */
+.loading {
+    contain: layout style paint;
+}
+
+.loading i {
+    animation: spin 1s linear infinite;
+    transform: translateZ(0);
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg) translateZ(0); }
+    100% { transform: rotate(360deg) translateZ(0); }
+}
+
+/* Memory-efficient gradients */
+.header-title,
+.docs-title {
+    background: linear-gradient(135deg, var(--theme-accent-primary), var(--theme-accent-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    contain: layout style paint;
+}
+
+/* Optimize chart containers */
+.chart-container {
+    contain: layout;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Reduce paint complexity */
+.status-indicator {
+    contain: layout style paint;
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    display: inline-block;
+}
+
+/* Optimize navigation */
+.header-actions {
+    contain: layout;
+}
+
+.header-action-btn {
+    contain: layout style paint;
+}
+
+/* Lightweight responsive design */
+@media (max-width: 768px) {
+    .stats-grid,
+    .analyzers-grid,
+    .feature-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .chart-container {
+        height: 250px;
+    }
+}
+
+/* Critical rendering path optimization */
+.above-fold {
+    contain: layout style paint;
+}
+
+/* Reduce JavaScript layout calculations */
+.fixed-height {
+    height: 400px;
+    contain: size layout;
+}
+
+/* Optimize table rendering */
+.endpoint-card {
+    contain: layout style paint;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Efficient color transitions */
+.theme-transition {
+    transition: background-color 0.2s ease,
+                color 0.2s ease,
+                border-color 0.2s ease;
+}
+
+/* Optimize form elements */
+input, button, select, textarea {
+    contain: layout style paint;
+}
+
+/* Reduce composite layers */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    contain: layout style paint;
+}
+
+/* Performance monitoring styles */
+.perf-monitor {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    z-index: 9999;
+    display: none;
+}
+
+.perf-monitor.show {
+    display: block;
+}
+
+/* Optimize critical path */
+.critical {
+    contain: layout style paint;
+    will-change: auto;
+}
+
+/* Lightweight animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px) translateZ(0); }
+    to { opacity: 1; transform: translateY(0) translateZ(0); }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Optimize grid layouts */
+.grid-optimized {
+    display: grid;
+    contain: layout;
+    gap: 1rem;
+}
+
+/* Reduce paint area */
+.card-content {
+    contain: layout style paint;
+}
+
+/* Efficient shadows */
+.shadow-optimized {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    contain: layout style paint;
+}
+
+/* Memory-efficient borders */
+.border-optimized {
+    border: 1px solid var(--theme-border-color);
+    contain: layout style paint;
+}
+
+/* Optimize text rendering */
+.text-optimized {
+    text-rendering: optimizeSpeed;
+    contain: layout style paint;
+}
+
+/* Reduce layout complexity */
+.simple-layout {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    contain: layout;
+}
+
+/* Efficient spacing */
+.spacing-optimized {
+    margin: 0;
+    padding: 1rem;
+    contain: layout;
+}
+
+/* Optimize background patterns */
+.pattern-optimized {
+    background-size: 20px 20px;
+    background-repeat: repeat;
+    contain: layout style paint;
+}
+
+/* Lightweight focus states */
+.focus-optimized:focus {
+    outline: 2px solid var(--theme-accent-primary);
+    outline-offset: 2px;
+    contain: layout style paint;
+}
+
+/* Reduce reflow on resize */
+.resize-optimized {
+    resize: none;
+    contain: layout size;
+}
+
+/* Optimize list rendering */
+.list-optimized {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    contain: layout;
+}
+
+.list-optimized li {
+    contain: layout style paint;
+}
+
+/* Efficient visibility toggles */
+.hidden-optimized {
+    visibility: hidden;
+    contain: layout style paint;
+}
+
+.visible-optimized {
+    visibility: visible;
+    contain: layout style paint;
+}
+
+/* Optimize modal dialogs */
+.modal-optimized {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) translateZ(0);
+    contain: layout style paint;
+}
+
+/* Reduce composite layers for better performance */
+.no-composite {
+    will-change: auto;
+    transform: none;
+}
+
+/* Critical CSS for above-the-fold content */
+.critical-css {
+    contain: layout style paint;
+    display: block;
+    width: 100%;
+}

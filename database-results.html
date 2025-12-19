@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <title>📊 SBARDS Database Results</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/static/css/themes.css" rel="stylesheet">
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--theme-bg-primary);
+            color: var(--theme-text-primary);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: var(--theme-accent-primary);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            border-radius: 12px;
+        }
+
+        .header h1 {
+            margin: 0 0 1rem 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--theme-bg-secondary);
+            border: 2px solid var(--theme-border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--theme-text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .filters-section {
+            background: var(--theme-bg-secondary);
+            border: 2px solid var(--theme-border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            padding: 0.5rem;
+            border: 2px solid var(--theme-border-color);
+            border-radius: 8px;
+            background: var(--theme-bg-tertiary);
+            color: var(--theme-text-primary);
+        }
+
+        .btn {
+            background: var(--theme-accent-primary);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--theme-accent-secondary);
+        }
+
+        .results-section {
+            background: var(--theme-bg-secondary);
+            border: 2px solid var(--theme-border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .results-table th,
+        .results-table td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid var(--theme-border-color);
+        }
+
+        .results-table th {
+            background: var(--theme-bg-tertiary);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+
+        .results-table tr:hover {
+            background: var(--theme-bg-tertiary);
+        }
+
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-clean {
+            background: var(--theme-success);
+            color: white;
+        }
+
+        .status-suspicious {
+            background: var(--theme-warning);
+            color: white;
+        }
+
+        .status-malicious {
+            background: var(--theme-error);
+            color: white;
+        }
+
+        .status-pending {
+            background: var(--theme-info);
+            color: white;
+        }
+
+        .hash-display {
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: var(--theme-text-secondary);
+        }
+
+        .details-btn {
+            background: var(--theme-info);
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .details-btn:hover {
+            opacity: 0.8;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--theme-text-secondary);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .pagination button {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--theme-border-color);
+            background: var(--theme-bg-tertiary);
+            color: var(--theme-text-primary);
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .pagination button:hover {
+            background: var(--theme-accent-primary);
+            color: white;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: var(--theme-bg-secondary);
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 80%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close {
+            color: var(--theme-text-secondary);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: var(--theme-text-primary);
+        }
+
+        .detail-section {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: var(--theme-bg-tertiary);
+            border-radius: 8px;
+        }
+
+        .detail-section h4 {
+            margin: 0 0 0.5rem 0;
+            color: var(--theme-accent-primary);
+        }
+
+        .json-display {
+            background: var(--theme-bg-primary);
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📊 SBARDS Database Results</h1>
+            <p>Analysis Results & File Processing History</p>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-icon">📁</div>
+                <div class="stat-value" id="totalFiles">-</div>
+                <div class="stat-label">Total Files</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <div class="stat-value" id="safeFiles">-</div>
+                <div class="stat-label">Safe Files</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🚨</div>
+                <div class="stat-value" id="threatFiles">-</div>
+                <div class="stat-label">Threat Files</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⏱️</div>
+                <div class="stat-value" id="lastUpdate">-</div>
+                <div class="stat-label">Last Update</div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-section">
+            <h3>🔍 Filters & Search</h3>
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label for="threatFilter">Threat Level:</label>
+                    <select id="threatFilter">
+                        <option value="">All Files</option>
+                        <option value="CLEAN">Clean</option>
+                        <option value="SUSPICIOUS">Suspicious</option>
+                        <option value="MALICIOUS">Malicious</option>
+                        <option value="PENDING">Pending</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="limitFilter">Results per page:</label>
+                    <select id="limitFilter">
+                        <option value="25">25</option>
+                        <option value="50" selected>50</option>
+                        <option value="100">100</option>
+                        <option value="200">200</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <button class="btn" onclick="loadResults()">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+                <div class="filter-group">
+                    <button class="btn" onclick="refreshData()" style="background: var(--theme-success);">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div class="results-section">
+            <h3>📋 Analysis Results</h3>
+            <div id="loadingIndicator" class="loading">
+                <i class="fas fa-spinner fa-spin"></i> Loading results...
+            </div>
+            <div id="resultsContainer" style="display: none;">
+                <table class="results-table" id="resultsTable">
+                    <thead>
+                        <tr>
+                            <th>File Name</th>
+                            <th>Size</th>
+                            <th>Status</th>
+                            <th>Hash</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsBody">
+                        <!-- Results will be populated here -->
+                    </tbody>
+                </table>
+                <div class="pagination" id="pagination">
+                    <!-- Pagination will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div style="text-align: center; margin-top: 2rem;">
+            <a href="/dashboard" class="btn" style="background: var(--theme-bg-tertiary); color: var(--theme-text-primary); border: 2px solid var(--theme-border-color);">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+            <a href="/api/static-analysis/page" class="btn" style="background: var(--theme-info);">
+                <i class="fas fa-upload"></i> Upload & Analyze
+            </a>
+            <!-- Added navigation links to new pages -->
+            <a href="/api/static-analysis/statistics/page" class="btn" style="background: var(--theme-accent-secondary);">
+                <i class="fas fa-chart-pie"></i> View Statistics
+            </a>
+            <a href="/api/response/results/page" class="btn" style="background: var(--theme-warning);">
+                <i class="fas fa-tasks"></i> Response Results
+            </a>
+        </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div id="detailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle">File Details</h2>
+            <div id="modalContent">
+                <!-- Details will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentPage = 0;
+        let currentLimit = 50;
+        let currentFilter = '';
+        let allResults = [];
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadResults();
+            
+            // Auto-refresh every 30 seconds
+            setInterval(refreshData, 30000);
+        });
+
+        // Load results from API
+        async function loadResults() {
+            try {
+                document.getElementById('loadingIndicator').style.display = 'block';
+                document.getElementById('resultsContainer').style.display = 'none';
+
+                const limit = document.getElementById('limitFilter').value;
+                const threatLevel = document.getElementById('threatFilter').value;
+                const offset = currentPage * limit;
+
+                let url = `/api/static-analysis/database-results?limit=${limit}&offset=${offset}`;
+                if (threatLevel) {
+                    url += `&threat_level=${threatLevel}`;
+                }
+
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                // Update statistics
+                updateStatistics(data);
+                
+                // Display results
+                displayResults(data.files);
+                
+                // Update pagination
+                updatePagination(data.returned_count, parseInt(limit));
+
+                document.getElementById('loadingIndicator').style.display = 'none';
+                document.getElementById('resultsContainer').style.display = 'block';
+
+            } catch (error) {
+                console.error('Error loading results:', error);
+                document.getElementById('loadingIndicator').innerHTML = 
+                    `<i class="fas fa-exclamation-triangle"></i> Error loading results: ${error.message}`;
+            }
+        }
+
+        // Update statistics display
+        function updateStatistics(data) {
+            document.getElementById('totalFiles').textContent = data.total_files || 0;
+            document.getElementById('safeFiles').textContent = data.safe_files || 0;
+            document.getElementById('threatFiles').textContent = data.threat_files || 0;
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+        }
+
+        // Display results in table
+        function displayResults(files) {
+            const tbody = document.getElementById('resultsBody');
+            tbody.innerHTML = '';
+
+            if (!files || files.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--theme-text-secondary);">No results found</td></tr>';
+                return;
+            }
+
+            files.forEach((file, index) => {
+                const row = document.createElement('tr');
+                
+                // Status badge
+                let statusClass = 'status-pending';
+                let statusIcon = '⏳';
+                
+                if (file.status === 'CLEAN') {
+                    statusClass = 'status-clean';
+                    statusIcon = '✅';
+                } else if (file.status === 'SUSPICIOUS') {
+                    statusClass = 'status-suspicious';
+                    statusIcon = '⚠️';
+                } else if (file.status === 'MALICIOUS') {
+                    statusClass = 'status-malicious';
+                    statusIcon = '🚨';
+                }
+
+                row.innerHTML = `
+                    <td>
+                        <div style="font-weight: 600;">${file.name || 'Unknown'}</div>
+                        <div style="font-size: 0.8rem; color: var(--theme-text-secondary);">${file.extension || ''}</div>
+                    </td>
+                    <td>${formatFileSize(file.size || 0)}</td>
+                    <td>
+                        <span class="status-badge ${statusClass}">
+                            ${statusIcon} ${file.status || 'PENDING'}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="hash-display">
+                            ${file.hash ? file.hash.substring(0, 16) + '...' : 'N/A'}
+                        </div>
+                    </td>
+                    <td>${file.created_at ? new Date(file.created_at).toLocaleString() : 'N/A'}</td>
+                    <td>
+                        <button class="details-btn" onclick="showDetails(${index})">
+                            <i class="fas fa-info-circle"></i> Details
+                        </button>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+
+            // Store results for details modal
+            allResults = files;
+        }
+
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Update pagination
+        function updatePagination(resultCount, limit) {
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+
+            // Previous button
+            const prevBtn = document.createElement('button');
+            prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i> Previous';
+            prevBtn.disabled = currentPage === 0;
+            prevBtn.onclick = () => {
+                if (currentPage > 0) {
+                    currentPage--;
+                    loadResults();
+                }
+            };
+            pagination.appendChild(prevBtn);
+
+            // Page info
+            const pageInfo = document.createElement('span');
+            pageInfo.textContent = `Page ${currentPage + 1}`;
+            pageInfo.style.padding = '0.5rem 1rem';
+            pageInfo.style.color = 'var(--theme-text-primary)';
+            pagination.appendChild(pageInfo);
+
+            // Next button
+            const nextBtn = document.createElement('button');
+            nextBtn.innerHTML = 'Next <i class="fas fa-chevron-right"></i>';
+            nextBtn.disabled = resultCount < limit;
+            nextBtn.onclick = () => {
+                if (resultCount >= limit) {
+                    currentPage++;
+                    loadResults();
+                }
+            };
+            pagination.appendChild(nextBtn);
+        }
+
+        // Show file details in modal
+        function showDetails(index) {
+            const file = allResults[index];
+            if (!file) return;
+
+            document.getElementById('modalTitle').textContent = `Details: ${file.name}`;
+            
+            let content = `
+                <div class="detail-section">
+                    <h4>📁 File Information</h4>
+                    <p><strong>Name:</strong> ${file.name || 'N/A'}</p>
+                    <p><strong>Extension:</strong> ${file.extension || 'N/A'}</p>
+                    <p><strong>Size:</strong> ${formatFileSize(file.size || 0)}</p>
+                    <p><strong>Status:</strong> ${file.status || 'N/A'}</p>
+                    <p><strong>Created:</strong> ${file.created_at ? new Date(file.created_at).toLocaleString() : 'N/A'}</p>
+                    <p><strong>Hash (SHA-256):</strong></p>
+                    <div class="json-display">${file.hash || 'N/A'}</div>
+                </div>
+            `;
+
+            if (file.static_analysis) {
+                content += `
+                    <div class="detail-section">
+                        <h4>🛡️ Static Analysis Results</h4>
+                        <p><strong>YARA Matches:</strong> ${file.static_analysis.yara_matches || '[]'}</p>
+                        <p><strong>Signature Valid:</strong> ${file.static_analysis.signature_valid !== null ? file.static_analysis.signature_valid : 'N/A'}</p>
+                        <p><strong>Permissions OK:</strong> ${file.static_analysis.permissions_ok !== null ? file.static_analysis.permissions_ok : 'N/A'}</p>
+                        <p><strong>Entropy Score:</strong> ${file.static_analysis.entropy_score !== null ? file.static_analysis.entropy_score : 'N/A'}</p>
+                        <p><strong>VirusTotal Verdict:</strong> ${file.static_analysis.vt_verdict || 'N/A'}</p>
+                    </div>
+                `;
+            }
+
+            if (file.verdict) {
+                content += `
+                    <div class="detail-section">
+                        <h4>⚖️ Analysis Verdict</h4>
+                        <p><strong>Analysis Type:</strong> ${file.verdict.analysis_type || 'N/A'}</p>
+                        <p><strong>Verdict:</strong> ${file.verdict.verdict || 'N/A'}</p>
+                        <p><strong>Verdict Date:</strong> ${file.verdict.created_at ? new Date(file.verdict.created_at).toLocaleString() : 'N/A'}</p>
+                    </div>
+                `;
+            }
+
+            document.getElementById('modalContent').innerHTML = content;
+            document.getElementById('detailsModal').style.display = 'block';
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('detailsModal').style.display = 'none';
+        }
+
+        // Refresh data
+        function refreshData() {
+            currentPage = 0;
+            loadResults();
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('detailsModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
